@@ -1,5 +1,5 @@
-project_path: /web/fundamentals/_project.yaml
-book_path: /web/fundamentals/_book.yaml
+project_path: /web/fundamentals/\_project.yaml
+book_path: /web/fundamentals/\_book.yaml
 description: Modern sites often contain a lot of JavaScript. These scripts are often sent down in large, monolithic bundles which can take a long time to download and process. Code-splitting encourages breaking up these scripts so you only send what a user needs when they need it.
 
 {# wf_updated_on: 2018-08-01 #}
@@ -13,39 +13,38 @@ description: Modern sites often contain a lot of JavaScript. These scripts are o
 
 **TL;DR:**
 
-- Modern sites often combine all of their JavaScript into a single, large bundle.
-When JavaScript is served this way, download and processing times can be
-significant on mobile devices and networks.
-- An alternative to large bundles is code-splitting, which is where JavaScript is
-split into smaller chunks. This enables sending the minimal code required to
-provide value upfront, improving page-load times. The rest can be loaded on
-demand.
+- Modern sites often use **bundlers** to combine all of their JavaScript into a single, large file, however when too much JavaScript is served this way, download and processing times can be significant on mobile devices and networks.
+- Since JavaScript is often the most expensive resource to load on a website, this cost can be reduced by only shipping the minimum code required to provide value up front. The remaing JavaScript can be separated into smaller separate chunks to be loaded on-demand. This technique is called **lazy-loading**.
+- Modern **bundlers** like webpack and parcel, perform a technique called **code-splitting** to create individual bundles of JavaScript that will be lazy-loaded. Code-splitting has two unique characteristics that separate itself from other lazy-loading techniques:
+  - **Bundles are created at build-time.** This is important for caching and network optimizations as your app scales. Code-splitting is never a runtime technique.
+  - **Split-points are defined based on code you write**. With code-splitting, you never have to configure where split points begin or end, you just use syntax in your code &mdash; like `import()` &mdash; and bundlers handle the rest.
 - Do you need code-splitting? Check Lighthouse's [JavaScript Bootup Time is Too
-High audit](/web/tools/lighthouse/audits/bootup) and [the code coverage
-panel](/web/updates/2017/04/devtools-release-notes#coverage) in DevTools to
-measure the impact of your app's scripts on performance and how many scripts are
-unused.
-- Code-splitting can be done in the following ways:
-    - **Vendor splitting** separates vendor code (e.g., React or lodash) away
-from your app's code. This allows you to keep application and vendor code
-separate. This isolates the negative performance impacts of cache invalidation
-for returning users when either your vendor or app code changes. This should be
-done in _every_ app.
-    - **Entry point splitting** separates code by entry point(s) in your app,
-which are the scripts where tools like webpack and Parcel start when they build
-a dependency tree of your app. This is best for pages or apps where client side
-routing is not used, or a blended app where some parts use server side routing
-and others are part of a single page application.
-    - **Dynamic splitting** separates code where dynamic `import()` statements
-are used. This type of splitting is often best for single page applications.
+  High audit](/web/tools/lighthouse/audits/bootup) and [the code coverage
+  panel](/web/updates/2017/04/devtools-release-notes#coverage) in DevTools to
+  measure the impact of your app's scripts on performance and how many scripts are
+  unused.
+- When should you use code-splitting?
+  - **Client-side routes** should always be code-split. By separating each route into lazy-loaded bundles, only the JavaScript and functionality for the **current route** will be loaded up front. This means the remaining routes will loaded on-demand and wont't contribute to your initial page load.
+  - **Temporal** elements &mdash; such as modals and tooltips &mdash; are not visible by default. Only until some event occurs do they need to be visible on the page. Since it is not needed for your initial page to render, it should be lazy-loaded instead.
+  - **Any conditional** behavior can be code-split. Prioritize code-splitting for large modules that are unused up front.
 - Choose tools that split code for you ([Preact
-CLI](https://github.com/developit/preact-cli/),
-[Gatsby](https://www.gatsbyjs.org/), [PWA Starter
-Kit](https://github.com/Polymer/pwa-starter-kit/), _et al._) where possible.
-[React](https://reactjs.org/docs/code-splitting.html),
-[Vue](https://vuejsdevelopers.com/2017/07/03/vue-js-code-splitting-webpack/),
-and [Angular](https://angular.io/guide/lazy-loading-ngmodules) support manual
-code-splitting.
+  CLI](https://github.com/developit/preact-cli/),
+  [Gatsby](https://www.gatsbyjs.org/), [PWA Starter
+  Kit](https://github.com/Polymer/pwa-starter-kit/), _et al._) where possible.
+  [React](https://reactjs.org/docs/code-splitting.html),
+  [Vue](https://vuejsdevelopers.com/2017/07/03/vue-js-code-splitting-webpack/),
+  and [Angular](https://angular.io/guide/lazy-loading-ngmodules) support code-splitting.
+- There are other valuable ways to reduce JavaScript payloads
+  - **Vendor caching** separates vendor code (e.g., React or lodash) away
+    from your app's code. This allows you to keep application and vendor code
+    separate. This isolates the negative performance impacts of cache invalidation
+    for returning users when either your vendor or app code changes. This should be
+    done in _every_ app.
+  - **Multi-entry apps** separate code by entry point in your app,
+    which are the scripts where tools like webpack and Parcel start when they build
+    a dependency tree of your app. This is best for pages or apps where client side
+    routing is not used, or a blended app where some parts use server side routing
+    and others are part of a single page application.
 
 Maybe you've heard this before, but [there's a _lot_ of JavaScript on web pages
 now](https://httparchive.org/reports/state-of-javascript#bytesJs), and on median
@@ -167,10 +166,10 @@ guitar pedals.</figcaption>
 This app has three routes:
 
 1. The search page, which is the default route where users can search for [guitar
-pedals](https://en.wikipedia.org/wiki/Effects_unit#Stompboxes).
+   pedals](https://en.wikipedia.org/wiki/Effects_unit#Stompboxes).
 2. The pedal detail page, which is shown when the user clicks on a pedal in the
-search results listing. Users can also add a pedal to their favorites list from
-this page.
+   search results listing. Users can also add a pedal to their favorites list from
+   this page.
 3. The favorite pedals page, which lists the user's favorite pedals.
 
 Most examples will show you how to split code along these routes using
@@ -218,7 +217,7 @@ module.exports = {
     main: path.join(__dirname, "src", "index.js"),
     detail: path.join(__dirname, "src", "detail.js"),
     favorites: path.join(__dirname, "src", "favorites.js")
-  },
+  }
   // ...
 };
 ```
@@ -280,9 +279,9 @@ module.exports = {
       }
     },
     runtimeChunk: {
-        name: "vendors"
+      name: "vendors"
     }
-   },
+  }
   // ...
 };
 ```
@@ -401,11 +400,14 @@ import Search from "./components/Search/Search";
 import PedalDetail from "./components/PedalDetail/PedalDetail";
 import Favorites from "./components/Favorites/Favorites";
 
-render(<Router>
-  <Search path="/" default/>
-  <PedalDetail path="/pedal/:id"/>
-  <Favorites path="/favorites"/>
-</Router>, document.getElementById("app"));
+render(
+  <Router>
+    <Search path="/" default />
+    <PedalDetail path="/pedal/:id" />
+    <Favorites path="/favorites" />
+  </Router>,
+  document.getElementById("app")
+);
 ```
 
 Here, we're loading every component for every route whether or not the user ever
@@ -421,21 +423,38 @@ import AsyncRoute from "preact-async-route";
 import { h, render, Component } from "preact";
 import Search from "./components/Search/Search";
 
-render(<Router>
-  <Search path="/" default/>
-  <AsyncRoute path="/pedal/:id" getComponent={() => import("./components/PedalDetail/PedalDetail").then(module => module.default)}/>
-  <AsyncRoute path="/favorites" getComponent={() => import("./components/Favorites/Favorites").then(module => module.default)}/>
-</Router>, document.getElementById("app"));
+render(
+  <Router>
+    <Search path="/" default />
+    <AsyncRoute
+      path="/pedal/:id"
+      getComponent={() =>
+        import("./components/PedalDetail/PedalDetail").then(
+          module => module.default
+        )
+      }
+    />
+    <AsyncRoute
+      path="/favorites"
+      getComponent={() =>
+        import("./components/Favorites/Favorites").then(
+          module => module.default
+        )
+      }
+    />
+  </Router>,
+  document.getElementById("app")
+);
 ```
 
 You'll notice that are few things are different from the previous example:
 
 1. We're statically importing only the `Search` component. This is because the
-default route uses this component, so it's reasonable to load it up front.
+   default route uses this component, so it's reasonable to load it up front.
 2. preact-async-route handles asynchronous routing via the `AsyncRoute` component.
 3. The `PedalDetail` and `Favorites` components are lazy loaded when the user
-navigates to the routes using them by the `AsyncRoute` component via `import()`
-statements.
+   navigates to the routes using them by the `AsyncRoute` component via `import()`
+   statements.
 
 When we build the app, Parcel outputs the following:
 
@@ -479,11 +498,28 @@ of comment known as an inline directive to tell webpack what the output file
 names should be:
 
 ```javascript
-render(<Router>
-  <Search path="/" default/>
-  <AsyncRoute path="/pedal/:id" getComponent={() => import(/* webpackChunkName: "PedalDetail" */ "./components/PedalDetail/PedalDetail").then(module => module.default)}/>
-  <AsyncRoute path="/favorites" getComponent={() => import(/* webpackChunkName: "Favorites" */ "./components/Favorites/Favorites").then(module => module.default)}/>
-</Router>, document.getElementById("app"));
+render(
+  <Router>
+    <Search path="/" default />
+    <AsyncRoute
+      path="/pedal/:id"
+      getComponent={() =>
+        import(/* webpackChunkName: "PedalDetail" */ "./components/PedalDetail/PedalDetail").then(
+          module => module.default
+        )
+      }
+    />
+    <AsyncRoute
+      path="/favorites"
+      getComponent={() =>
+        import(/* webpackChunkName: "Favorites" */ "./components/Favorites/Favorites").then(
+          module => module.default
+        )
+      }
+    />
+  </Router>,
+  document.getElementById("app")
+);
 ```
 
 Here, an inline directive called `webpackChunkName` hints to webpack what the
@@ -522,10 +558,10 @@ functionality with a service worker after the initial route loads. Precaching is
 great for performance in the following ways:
 
 1. It doesn't impact loading performance of the app's initial load, because service
-worker registration and subsequent precaching occurs later on in the app loading
-process.
+   worker registration and subsequent precaching occurs later on in the app loading
+   process.
 2. Precaching remaining routes and functionality with a service worker ensures
-they're available immediately when they're requested later.
+   they're available immediately when they're requested later.
 
 Of course, adding a service worker to an app with code generated by modern
 tooling can be challenging, owing to a number of reasons (such as output
@@ -589,14 +625,14 @@ performance by masking latency. Though they're both very similar at first
 glance, they behave quite differently:
 
 1. [`rel=prefetch`](https://www.w3.org/TR/resource-hints/#prefetch) is a _low
-priority_ fetch for non-critical resources to be used on another route. Requests
-kicked off by `rel=prefetch` occur when the browser is idle.
+   priority_ fetch for non-critical resources to be used on another route. Requests
+   kicked off by `rel=prefetch` occur when the browser is idle.
 2. [`rel=preload`](https://www.w3.org/TR/preload/) is a _high priority_ fetch for
-critical resources used by the current route. Requests for resources kicked off
-by `rel=preload` may occur sooner than the browser may otherwise discover them
-(preloading is _very_ nuanced, though, so you may want to check out [this
-guide](/web/fundamentals/performance/resource-prioritization#preload) and the
-potentially [the spec](https://www.w3.org/TR/preload/), as well).
+   critical resources used by the current route. Requests for resources kicked off
+   by `rel=preload` may occur sooner than the browser may otherwise discover them
+   (preloading is _very_ nuanced, though, so you may want to check out [this
+   guide](/web/fundamentals/performance/resource-prioritization#preload) and the
+   potentially [the spec](https://www.w3.org/TR/preload/), as well).
 
 If you want an in-depth explainer on these resource hints, [read this
 article](https://medium.com/reloading/preload-prefetch-and-priorities-in-chrome-776165961bbf).
@@ -611,11 +647,28 @@ case for prefetching in this guide's example app occurs where we mount the app's
 `Router` component in the _index.js_ entry point:
 
 ```javascript
-render(<Router>
-  <Search path="/" default/>
-  <AsyncRoute path="/pedal/:id" getComponent={() => import(/* webpackChunkName: "PedalDetail" */ "./components/PedalDetail/PedalDetail").then(module => module.default)}/>
-  <AsyncRoute path="/favorites" getComponent={() => import(/* webpackPrefetch: true, webpackChunkName: "Favorites" */ "./components/Favorites/Favorites").then(module => module.default)}/>
-</Router>, document.getElementById("app"));
+render(
+  <Router>
+    <Search path="/" default />
+    <AsyncRoute
+      path="/pedal/:id"
+      getComponent={() =>
+        import(/* webpackChunkName: "PedalDetail" */ "./components/PedalDetail/PedalDetail").then(
+          module => module.default
+        )
+      }
+    />
+    <AsyncRoute
+      path="/favorites"
+      getComponent={() =>
+        import(/* webpackPrefetch: true, webpackChunkName: "Favorites" */ "./components/Favorites/Favorites").then(
+          module => module.default
+        )
+      }
+    />
+  </Router>,
+  document.getElementById("app")
+);
 ```
 
 Here, we've added the `webpackPrefetch` inline directive (in addition to
@@ -697,7 +750,7 @@ plugins: [
     rel: "preload",
     include: ["main", "vendors"]
   })
-]
+];
 ```
 
 This configuration will place add preload hints via `<link>` elements in the
@@ -731,17 +784,17 @@ curious to know more about code splitting, or want to read some different takes
 on the subject, check out this list of articles:
 
 - [Official webpack code splitting
-docs.](https://webpack.js.org/guides/code-splitting/)
+  docs.](https://webpack.js.org/guides/code-splitting/)
 - [Official Parcel.js code splitting
-docs.](https://parceljs.org/code_splitting.html)
+  docs.](https://parceljs.org/code_splitting.html)
 - [Official React code splitting
-docs.](https://reactjs.org/docs/code-splitting.html)
+  docs.](https://reactjs.org/docs/code-splitting.html)
 - [Official Vue code splitting
-docs.](https://vuejsdevelopers.com/2017/07/03/vue-js-code-splitting-webpack/)
+  docs.](https://vuejsdevelopers.com/2017/07/03/vue-js-code-splitting-webpack/)
 - [Official Angular code splitting
-docs.](https://angular.io/guide/lazy-loading-ngmodules)
+  docs.](https://angular.io/guide/lazy-loading-ngmodules)
 - [Dynamic import() guidance here on Web
-Fundamentals.](/web/updates/2017/11/dynamic-import)
+  Fundamentals.](/web/updates/2017/11/dynamic-import)
 
 Rest assured, though, that improving performance for your app will reap rewards,
 as users will find your app more enjoyable to use. Good luck!
